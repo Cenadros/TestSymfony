@@ -1,0 +1,14 @@
+{% from 'helpers/macros.html.twig' import icon %}
+
+<footer id="footer" class="footer">
+    <div class="u-wrapper u-flex u-flex--align-start u-flex--justify-between">
+        &copy; Runroom {{ 'now'|date('Y') }}
+        {{ icon('r-runroom') }}
+        <ul class="footer__pages">
+            {% for basicPage in get_basic_pages('footer') %}
+            <li><a href="{{ path('runroom.basic_page.route.show', {'slug': basicPage.slug}) }}">{{ basicPage.title }}</a></li>
+            {% endfor %}
+            <li><a href="{{ path('runroom.cookies.route.cookies') }}">{{ 'cookies.policy'|trans }}</a></li>
+        </ul>
+    </div>
+</footer>

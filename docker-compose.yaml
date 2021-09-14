@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+    app:
+        build:
+            context: .
+            target: fpm-dev
+        volumes:
+            - ./:/usr/app/:cached
+            - .docker/app-dev/extra.ini:/usr/local/etc/php/conf.d/extra.ini
+            - .docker/app-dev/www.conf:/usr/local/etc/php-fpm.d/www.conf
+            - /usr/app/var/
+            - /usr/app/node_modules/
+            - ${SSH_AUTH_SOCK}:${SSH_AUTH_SOCK}
+        depends_on:
+            - mysql
+        environment:
+            - SSH_AUTH_SOCK
+            - XDEBUG_CONFIG
+        # Prod
+        # build:
+        #     context: .
+        #     target: fpm-prod
+        # volumes:
+        #     - data-volume:/usr/app/public
+    nginx:
+        image: nginx:1.21
+        ports:
+            - 8080:80
+            - 8443:443
+        volumes:
+            - .docker/nginx-dev/nginx.conf:/etc/nginx/nginx.conf
+            - .certs:/usr/app/.certs:ro,cached
+            - ./public:/usr/app/public:ro,cached
+        depends_on:
+            - app
+        # Prod
+        # volumes:
+        #     - .docker/nginx-prod/nginx.conf:/etc/nginx/nginx.conf
+        #     - data-volume:/usr/app/public
+    mysql:
+        image: mysql:5.7
+        environment:
+            MYSQL_DATABASE: symfony
+            MYSQL_USER: symfony
+            MYSQL_PASSWORD: symfony
+            MYSQL_ROOT_PASSWORD: root
+        ports:
+            - 8336:3306
+    mailhog:
+        image: mailhog/mailhog
+        ports:
+            - 8025:8025
+
+# Prod
+# volumes:
+#     data-volume:
